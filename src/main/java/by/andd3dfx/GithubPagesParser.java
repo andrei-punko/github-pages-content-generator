@@ -11,7 +11,7 @@ import java.nio.file.Path;
 
 /**
  * Usage example:
- * java -jar github-parser-1.0-SNAPSHOT.jar inputFileName templateFileName htmlOutputFileName
+ * java -jar github-pages-parser.jar inputFileName templateFileName htmlOutputFileName
  */
 public class GithubPagesParser {
 
@@ -39,7 +39,7 @@ public class GithubPagesParser {
                         line = "<b>" + line.substring(2) + "</b>";
                     }
 
-                    buffer += line + "</br>\n";
+                    buffer += capitalize(line) + "</br>\n";
                     continue;
                 }
             }
@@ -51,6 +51,10 @@ public class GithubPagesParser {
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
+    }
+
+    private String capitalize(String str) {
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
     public void generateIndexHtml(String contentFileName, String templateFileName, String outputFileName) {
