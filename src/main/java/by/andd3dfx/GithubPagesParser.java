@@ -54,6 +54,9 @@ public class GithubPagesParser {
     }
 
     private String capitalize(String str) {
+        if (str.startsWith("http://") || str.startsWith("https://")) {
+            return "<a href=\"" + str + "\">" + str + "</a>";
+        }
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
