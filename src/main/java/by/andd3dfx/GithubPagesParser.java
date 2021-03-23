@@ -15,6 +15,8 @@ import java.nio.file.Path;
  */
 public class GithubPagesParser {
 
+    private static final String PLACEHOLDER_STRING = "***CONTENT_PLACEHOLDER***";
+
     public void parse(String inputFileName, String outputFileName) {
         try (
                 BufferedReader reader = new BufferedReader(new FileReader(inputFileName, StandardCharsets.UTF_8));
@@ -25,7 +27,7 @@ public class GithubPagesParser {
             while ((line = reader.readLine()) != null) {
 
                 if (line.isBlank()) {
-                    // Line os blank
+                    // Line is blank
                     if (buffer.isBlank()) {
                         writer.write("\n");
                     } else {
@@ -36,7 +38,7 @@ public class GithubPagesParser {
                 } else {
                     // line is not blank
                     if (line.startsWith("* ") || line.startsWith("- ")) {
-                        line = "<b>" + line.substring(2) + "</b>";
+                        line = "<b>" + capitalize(line.substring(2)) + "</b>";
                     }
 
                     buffer += capitalize(line) + "</br>\n";
@@ -64,7 +66,7 @@ public class GithubPagesParser {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFileName, StandardCharsets.UTF_8));) {
             String templateContent = Files.readString(Path.of(templateFileName));
             String content = Files.readString(Path.of(contentFileName));
-            String indexHtmlContent = templateContent.replace("***CONTENT_PLACEHOLDER***", content);
+            String indexHtmlContent = templateContent.replace(PLACEHOLDER_STRING, content);
 
             writer.write(indexHtmlContent);
         } catch (IOException e) {
