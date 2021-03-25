@@ -22,33 +22,38 @@ public class GithubPagesParser {
                 BufferedReader reader = new BufferedReader(new FileReader(inputFileName, StandardCharsets.UTF_8));
                 BufferedWriter writer = new BufferedWriter(new FileWriter(outputFileName, StandardCharsets.UTF_8));
         ) {
-            String line = null;
+            String line;
             String buffer = "";
+            boolean startedCodeBlock = false;
             while ((line = reader.readLine()) != null) {
 
                 if (line.isBlank()) {
-                    // Line is blank
-                    if (buffer.isBlank()) {
-                        writer.write("\n");
+                    // line is blank
+                    if (buffer.isBlank() || startedCodeBlock) {
+                        buffer += "\n";
                     } else {
                         writer.write("<p align=\"justify\">\n" + buffer + "</p>\n");
                         buffer = "";
-                        continue;
                     }
                 } else {
                     // line is not blank
                     if (line.startsWith("* ") || line.startsWith("- ")) {
-                        line = "<b>" + capitalize(line.substring(2)) + "</b>";
+                        buffer += "<b>" + capitalize(line.substring(2)) + "</b><br/>\n";
+                    } else if (line.startsWith("```")) {
+                        buffer += (startedCodeBlock ? "</pre>" : "<pre>") + "\n";
+                        startedCodeBlock = !startedCodeBlock;
+                    } else {
+                        if (!startedCodeBlock) {
+                            line = capitalize(line) + "<br/>";
+                        }
+                        buffer += line + "\n";
                     }
-
-                    buffer += capitalize(line) + "</br>\n";
-                    continue;
                 }
             }
 
             // Dump buffer content if it isn't empty
             if (!buffer.isBlank()) {
-                writer.write("<p align=\"justify\">\n" + buffer + "</p>\n");
+                writer.write("<p align=\"justify\">\n" + buffer + "</p>");
             }
         } catch (IOException ioe) {
             ioe.printStackTrace();
