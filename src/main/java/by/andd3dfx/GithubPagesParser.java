@@ -24,13 +24,10 @@ public class GithubPagesParser {
         ) {
             String line;
             String pBuffer = "";
-            String zBuffer = "";
-            boolean startedCodeBlock = false;
             while ((line = reader.readLine()) != null) {
 
                 if (line.isBlank()) {
-                    // line is blank
-                    if (pBuffer.isBlank() || startedCodeBlock) {
+                    if (pBuffer.isBlank()) {
                         pBuffer += "\n";
                         continue;
                     }
@@ -40,27 +37,32 @@ public class GithubPagesParser {
                     continue;
                 }
 
-                // line is not blank
                 if (line.startsWith("* ") || line.startsWith("- ")) {
                     pBuffer += wrapWithB(line) + "<br/>\n";
                     continue;
                 }
 
                 if (line.startsWith("```")) {
-                    pBuffer += (startedCodeBlock ? "</pre>" : "<pre>") + "\n";
-                    startedCodeBlock = !startedCodeBlock;
+                    String preBuffer = "";
+                    boolean preStarted = true;
+                    while ((line = reader.readLine()) != null) {
+                        if (line.startsWith("```")) {
+                            pBuffer += wrapWithPre(preBuffer);
+                            preStarted = false;
+                            break;
+                        }
+
+                        preBuffer += line + "\n";
+                    }
+                    if (preStarted) {
+                        throw new IllegalStateException("Ending '```' was not found!");
+                    }
                     continue;
                 }
 
-                if (!startedCodeBlock) {
-                    line = capitalize(line) + "<br/>";
-                }
+                line = capitalize(line) + "<br/>";
                 pBuffer += line + "\n";
                 continue;
-            }
-
-            if (startedCodeBlock) {
-                throw new IllegalStateException("Ending '```' was not found!");
             }
 
             // Dump pBuffer content if it isn't empty
@@ -70,6 +72,10 @@ public class GithubPagesParser {
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
+    }
+
+    private String wrapWithPre(String buffer) {
+        return "<pre>\n" + buffer + "</pre>\n";
     }
 
     private String wrapWithB(String line) {
