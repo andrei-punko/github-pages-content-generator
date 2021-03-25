@@ -23,41 +23,61 @@ public class GithubPagesParser {
                 BufferedWriter writer = new BufferedWriter(new FileWriter(outputFileName, StandardCharsets.UTF_8));
         ) {
             String line;
-            String buffer = "";
+            String pBuffer = "";
+            String zBuffer = "";
             boolean startedCodeBlock = false;
             while ((line = reader.readLine()) != null) {
 
                 if (line.isBlank()) {
                     // line is blank
-                    if (buffer.isBlank() || startedCodeBlock) {
-                        buffer += "\n";
-                    } else {
-                        writer.write("<p align=\"justify\">\n" + buffer + "</p>\n");
-                        buffer = "";
+                    if (pBuffer.isBlank() || startedCodeBlock) {
+                        pBuffer += "\n";
+                        continue;
                     }
-                } else {
-                    // line is not blank
-                    if (line.startsWith("* ") || line.startsWith("- ")) {
-                        buffer += "<b>" + capitalize(line.substring(2)) + "</b><br/>\n";
-                    } else if (line.startsWith("```")) {
-                        buffer += (startedCodeBlock ? "</pre>" : "<pre>") + "\n";
-                        startedCodeBlock = !startedCodeBlock;
-                    } else {
-                        if (!startedCodeBlock) {
-                            line = capitalize(line) + "<br/>";
-                        }
-                        buffer += line + "\n";
-                    }
+
+                    writer.write(wrapWitnP(pBuffer) + "\n");
+                    pBuffer = "";
+                    continue;
                 }
+
+                // line is not blank
+                if (line.startsWith("* ") || line.startsWith("- ")) {
+                    pBuffer += wrapWithB(line) + "<br/>\n";
+                    continue;
+                }
+
+                if (line.startsWith("```")) {
+                    pBuffer += (startedCodeBlock ? "</pre>" : "<pre>") + "\n";
+                    startedCodeBlock = !startedCodeBlock;
+                    continue;
+                }
+
+                if (!startedCodeBlock) {
+                    line = capitalize(line) + "<br/>";
+                }
+                pBuffer += line + "\n";
+                continue;
             }
 
-            // Dump buffer content if it isn't empty
-            if (!buffer.isBlank()) {
-                writer.write("<p align=\"justify\">\n" + buffer + "</p>");
+            if (startedCodeBlock) {
+                throw new IllegalStateException("Ending '```' was not found!");
+            }
+
+            // Dump pBuffer content if it isn't empty
+            if (!pBuffer.isBlank()) {
+                writer.write(wrapWitnP(pBuffer));
             }
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
+    }
+
+    private String wrapWithB(String line) {
+        return "<b>" + capitalize(line.substring(2)) + "</b>";
+    }
+
+    private String wrapWitnP(String buffer) {
+        return "<p align=\"justify\">\n" + buffer + "</p>";
     }
 
     private String capitalize(String str) {
