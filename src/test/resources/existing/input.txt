@@ -22,3 +22,11 @@ public class Singleton {		// Synchronized Accessor
     }
 }
 ```
+
+* xml example
+```
+<html>
+  <body>
+  </body>
+</html>
+```

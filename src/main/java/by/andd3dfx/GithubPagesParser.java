@@ -75,6 +75,9 @@ public class GithubPagesParser {
     }
 
     private String wrapWithPre(String buffer) {
+        buffer = buffer
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;");
         return "<pre>\n" + buffer + "</pre>\n";
     }
 
