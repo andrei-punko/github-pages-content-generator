@@ -27,26 +27,33 @@ public class GithubPagesParser {
             while ((line = reader.readLine()) != null) {
 
                 if (line.isBlank()) {
+                    // Line is blank
                     if (pBuffer.isBlank()) {
+                        // Buffer is empty
                         pBuffer += "\n";
                         continue;
                     }
 
+                    // Buffer is not empty
                     writer.write(wrapWitnP(pBuffer) + "\n");
                     pBuffer = "";
                     continue;
                 }
 
+                // Line is not blank
                 if (line.startsWith("* ") || line.startsWith("- ")) {
+                    // Title line
                     pBuffer += wrapWithB(line) + "<br/>\n";
                     continue;
                 }
 
                 if (line.startsWith("```")) {
+                    // Start of PRE block
                     String preBuffer = "";
                     boolean preStarted = true;
                     while ((line = reader.readLine()) != null) {
                         if (line.startsWith("```")) {
+                            // End of PRE block
                             pBuffer += wrapWithPre(preBuffer);
                             preStarted = false;
                             break;
@@ -60,6 +67,7 @@ public class GithubPagesParser {
                     continue;
                 }
 
+                // Usual line
                 line = capitalize(line) + "<br/>";
                 pBuffer += line + "\n";
                 continue;
