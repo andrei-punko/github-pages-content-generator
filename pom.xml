@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>by.andd3dfx</groupId>
-    <artifactId>github-pages-parser</artifactId>
+    <artifactId>github-pages-content-generator</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -45,7 +45,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>by.andd3dfx.GithubPagesParser</mainClass>
+                            <mainClass>by.andd3dfx.GithubPagesContentGenerator</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

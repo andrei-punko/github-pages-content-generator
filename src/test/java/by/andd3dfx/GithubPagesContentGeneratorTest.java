@@ -10,13 +10,13 @@ import java.nio.file.Path;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class GithubPagesParserTest {
+public class GithubPagesContentGeneratorTest {
 
-    private GithubPagesParser parser;
+    private GithubPagesContentGenerator parser;
 
     @Before
     public void setUp() {
-        parser = new GithubPagesParser();
+        parser = new GithubPagesContentGenerator();
     }
 
     @Test

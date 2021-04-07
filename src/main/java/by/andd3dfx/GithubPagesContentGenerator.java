@@ -13,7 +13,7 @@ import java.nio.file.Path;
  * Usage example:
  * java -jar github-pages-parser.jar inputFileName templateFileName htmlOutputFileName
  */
-public class GithubPagesParser {
+public class GithubPagesContentGenerator {
 
     private static final String PLACEHOLDER_STRING = "***CONTENT_PLACEHOLDER***";
 
@@ -126,7 +126,7 @@ public class GithubPagesParser {
         String templateFileName = args[1];
         String htmlOutputFileName = args[2];
 
-        GithubPagesParser parser = new GithubPagesParser();
+        GithubPagesContentGenerator parser = new GithubPagesContentGenerator();
         parser.parse(inputFileName, tmpFileName);
         parser.generateIndexHtml(tmpFileName, templateFileName, htmlOutputFileName);
 
