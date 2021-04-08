@@ -26,7 +26,6 @@ public class GithubPagesContentGenerator {
             while ((line = inputFileReader.readLine()) != null) {
 
                 if (line.isBlank()) {
-                    pBuffer.append("\n");
                     continue;
                 }
 
