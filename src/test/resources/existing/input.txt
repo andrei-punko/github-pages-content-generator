@@ -25,10 +25,10 @@ public class Singleton {		// Synchronized Accessor
 
 * xml example
 ```
-<html>
-  <body>
-  </body>
-</html>
+<one>
+  <two>
+  </two>
+</one>
 ```
 
 * Bulleted list
