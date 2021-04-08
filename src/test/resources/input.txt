@@ -43,3 +43,5 @@ one more line
 = three
 == sub three-1
 == sub three-2
+
+= four

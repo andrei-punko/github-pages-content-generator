@@ -66,8 +66,13 @@ public class GithubPagesContentGenerator {
                     } else {
                         String topStackElement = bulletedListStack.peek();
                         if (!startingBulletedPart.equals(topStackElement)) {
-                            pBuffer.append("<ul>\n");
-                            bulletedListStack.push(startingBulletedPart);
+                            if (startingBulletedPart.length() > topStackElement.length()) {
+                                pBuffer.append("<ul>\n");
+                                bulletedListStack.push(startingBulletedPart);
+                            } else {
+                                pBuffer.append("</ul>\n");
+                                bulletedListStack.pop();
+                            }
                         }
                     }
                     // Remove bulleted item marker from line
