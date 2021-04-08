@@ -7,13 +7,13 @@ import java.nio.file.Path;
 
 /**
  * Usage example:
- * java -jar github-pages-parser.jar inputFileName templateFileName htmlOutputFileName
+ * java -jar github-pages-content-generator.jar inputFileName templateFileName htmlOutputFileName
  */
 public class GithubPagesContentGenerator {
 
     private static final String PLACEHOLDER_STRING = "***CONTENT_PLACEHOLDER***";
 
-    public String generate(String inputFileName, String templateFileName) {
+    public String generate(String inputFileName, String templateFileName) throws IOException {
         StringBuilder outputBuffer = new StringBuilder();
         try (
                 BufferedReader inputFileReader = new BufferedReader(new FileReader(inputFileName, StandardCharsets.UTF_8));
@@ -39,11 +39,7 @@ public class GithubPagesContentGenerator {
                     continue;
                 }
 
-                // Remove starting/ending spaces
-                line = line.trim();
-
-                // Usual line: just write it capitalized
-                pBuffer.append(capitalize(line)).append("<br/>\n");
+                processUsualLine(line, pBuffer);
                 continue;
             }
 
@@ -51,10 +47,15 @@ public class GithubPagesContentGenerator {
 
             String templateContent = Files.readString(Path.of(templateFileName));
             return templateContent.replace(PLACEHOLDER_STRING, outputBuffer.toString());
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-            throw new IllegalStateException(ioe);
         }
+    }
+
+    private void processUsualLine(String line, StringBuilder pBuffer) {
+        // Remove starting/ending spaces
+        line = line.trim();
+
+        // Usual line: just write it capitalized
+        pBuffer.append(capitalize(line)).append("<br/>\n");
     }
 
     private void processTitleBlock(String line, StringBuilder pBuffer, StringBuilder outputBuffer) {
@@ -72,8 +73,8 @@ public class GithubPagesContentGenerator {
     }
 
     public void generate(String inputFileName, String templateFileName, String htmlOutputFileName) throws IOException {
-        String content = generate(inputFileName, templateFileName);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(htmlOutputFileName, StandardCharsets.UTF_8));) {
+            String content = generate(inputFileName, templateFileName);
             writer.write(content);
         }
     }
