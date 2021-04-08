@@ -36,3 +36,27 @@ public class Singleton {		// Synchronized Accessor
 &lt;/html&gt;
 </pre>
 </p>
+<p align="justify">
+<b>Bulleted list</b><br/>
+<ul>
+<li>One</li>
+Bla-bla<br/>
+</p>
+<p align="justify">
+<li>Two</li>
+<ul>
+<li>Sub two-1</li>
+One more line<br/>
+<li>Sub two-2</li>
+</p>
+<p align="justify">
+<ul>
+<li>Three</li>
+<ul>
+<li>Sub three-1</li>
+<li>Sub three-2</li>
+</ul>
+</ul>
+</ul>
+</ul>
+</p>

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Stack;
 
 /**
  * Usage example:
@@ -24,6 +25,9 @@ public class GithubPagesContentGenerator {
         ) {
             String line;
             String pBuffer = "";
+
+            Stack<String> bulletedListStartedFlagsStack = new Stack<>();
+
             while ((line = reader.readLine()) != null) {
 
                 if (line.isBlank()) {
@@ -42,6 +46,11 @@ public class GithubPagesContentGenerator {
 
                 // Line is not blank
                 if (line.startsWith("* ") || line.startsWith("- ")) {
+                    while (!bulletedListStartedFlagsStack.isEmpty()) {
+                        pBuffer += "</ul>\n";
+                        bulletedListStartedFlagsStack.pop();
+                    }
+
                     // Title line
                     pBuffer += wrapWithB(line) + "<br/>\n";
                     continue;
@@ -68,18 +77,47 @@ public class GithubPagesContentGenerator {
                 }
 
                 // Usual line
-                line = capitalize(line) + "<br/>";
-                pBuffer += line + "\n";
+                line = line.trim();
+                if (line.matches("^=+\\s.*")) {
+                    String startingBulletedPart = line.substring(0, line.indexOf(" "));
+                    if (bulletedListStartedFlagsStack.isEmpty()) {
+                        pBuffer += "<ul>\n";
+                        bulletedListStartedFlagsStack.push(startingBulletedPart);
+                    } else {
+                        String topStackElement = bulletedListStartedFlagsStack.peek();
+                        if (!startingBulletedPart.equals(topStackElement)) {
+                            pBuffer += "<ul>\n";
+                            bulletedListStartedFlagsStack.push(startingBulletedPart);
+                        }
+                    }
+                    line = line.replaceFirst("^=+\\s", "");
+                    pBuffer += wrapWithLi(capitalize(line));
+                    continue;
+                }
+
+                pBuffer += capitalize(line) + "<br/>" + "\n";
                 continue;
             }
 
             // Dump pBuffer content if it isn't empty
             if (!pBuffer.isBlank()) {
+                while (!bulletedListStartedFlagsStack.isEmpty()) {
+                    pBuffer += "</ul>\n";
+                    bulletedListStartedFlagsStack.pop();
+                }
                 writer.write(wrapWitnP(pBuffer));
             }
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
+    }
+
+    private String wrapWithUl(String str) {
+        return "<ul>\n" + str + "\n</ul>\n";
+    }
+
+    private String wrapWithLi(String str) {
+        return "<li>" + str + "</li>\n";
     }
 
     private String wrapWithPre(String buffer) {
