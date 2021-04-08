@@ -1,10 +1,6 @@
 package by.andd3dfx;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,16 +14,16 @@ public class GithubPagesContentGenerator {
 
     private static final String PLACEHOLDER_STRING = "***CONTENT_PLACEHOLDER***";
 
-    public void parse(String inputFileName, String outputFileName) {
+    public String generate(String inputFileName, String templateFileName) {
+        StringBuilder outputBuffer = new StringBuilder();
         try (
-                BufferedReader reader = new BufferedReader(new FileReader(inputFileName, StandardCharsets.UTF_8));
-                BufferedWriter writer = new BufferedWriter(new FileWriter(outputFileName, StandardCharsets.UTF_8));
+                BufferedReader inputFileReader = new BufferedReader(new FileReader(inputFileName, StandardCharsets.UTF_8));
         ) {
             String line;
             StringBuilder pBuffer = new StringBuilder();
             Stack<String> bulletedListStack = new Stack<>();
 
-            while ((line = reader.readLine()) != null) {
+            while ((line = inputFileReader.readLine()) != null) {
 
                 if (line.isBlank()) {
                     pBuffer.append("\n");
@@ -44,7 +40,7 @@ public class GithubPagesContentGenerator {
 
                     // Dump current buffer content into output file
                     if (pBuffer.length() > 0) {
-                        writer.write(wrapWitnP(pBuffer.toString()));
+                        outputBuffer.append(wrapWitnP(pBuffer.toString()));
                         pBuffer.setLength(0);
                     }
 
@@ -55,7 +51,7 @@ public class GithubPagesContentGenerator {
 
                 // Start of PRE block
                 if (line.startsWith("```")) {
-                    processPreBlock(reader, pBuffer);
+                    processPreBlock(inputFileReader, pBuffer);
                     continue;
                 }
 
@@ -92,11 +88,22 @@ public class GithubPagesContentGenerator {
                     pBuffer.append("</ul>\n");
                     bulletedListStack.pop();
                 }
-                writer.write(wrapWitnP(pBuffer.toString()));
+                outputBuffer.append(wrapWitnP(pBuffer.toString()));
                 pBuffer.setLength(0);   // To avoid miss this cleanup in the future
             }
+
+            String templateContent = Files.readString(Path.of(templateFileName));
+            return templateContent.replace(PLACEHOLDER_STRING, outputBuffer.toString());
         } catch (IOException ioe) {
             ioe.printStackTrace();
+            throw new IllegalStateException(ioe);
+        }
+    }
+
+    public void generate(String inputFileName, String templateFileName, String htmlOutputFileName) throws IOException {
+        String content = generate(inputFileName, templateFileName);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(htmlOutputFileName, StandardCharsets.UTF_8));) {
+            writer.write(content);
         }
     }
 
@@ -147,32 +154,16 @@ public class GithubPagesContentGenerator {
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
-    public void generateIndexHtml(String contentFileName, String templateFileName, String outputFileName) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFileName, StandardCharsets.UTF_8));) {
-            String templateContent = Files.readString(Path.of(templateFileName));
-            String content = Files.readString(Path.of(contentFileName));
-            String indexHtmlContent = templateContent.replace(PLACEHOLDER_STRING, content);
-
-            writer.write(indexHtmlContent);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public static void main(String[] args) throws IOException {
         if (args.length != 3) {
             throw new IllegalArgumentException("Wrong amount of incoming params: inputFileName, templateFileName and htmlOutputFileName should be populated!");
         }
 
         String inputFileName = args[0];
-        String tmpFileName = "tmp.txt";
         String templateFileName = args[1];
         String htmlOutputFileName = args[2];
 
-        GithubPagesContentGenerator parser = new GithubPagesContentGenerator();
-        parser.parse(inputFileName, tmpFileName);
-        parser.generateIndexHtml(tmpFileName, templateFileName, htmlOutputFileName);
-
-        Files.delete(Path.of(tmpFileName));
+        GithubPagesContentGenerator generator = new GithubPagesContentGenerator();
+        generator.generate(inputFileName, templateFileName, htmlOutputFileName);
     }
 }

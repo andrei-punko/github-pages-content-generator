@@ -20,28 +20,31 @@ public class GithubPagesContentGeneratorTest {
     }
 
     @Test
-    public void parse() throws IOException {
-        String inputFileName = "./src/test/resources/existing/input.txt";
-        String outputFileName = "./target/output.txt";
-        String expectedOutputFileName = "./src/test/resources/expected/output.txt";
+    public void generate() throws IOException {
+        String inputFileName = "./src/test/resources/input.txt";
+        String templateFileName = "./src/test/resources/template.html";
+        String expectedGeneratedContent = Files.readString(Path.of("./src/test/resources/output.html"));
 
-        parser.parse(inputFileName, outputFileName);
+        String content = parser.generate(inputFileName, templateFileName);
 
-        checkGeneratedFileContent(expectedOutputFileName);
+        assertThat(content, is(expectedGeneratedContent));
     }
 
     @Test
-    public void generateIndexHtml() throws IOException {
-        String expectedOutputFileName = "./src/test/resources/expected/index.html";
+    public void generateByTemplate() throws IOException {
+        String inputFileName = "./src/test/resources/input.txt";
+        String templateFileName = "./src/test/resources/template.html";
+        String expectedOutputFileName = "./src/test/resources/output.html";
+        String outputFileName = "./target/output.html";
 
-        parser.generateIndexHtml("./target/output.txt", "./src/main/resources/template.html", "./target/index.html");
+        parser.generate(inputFileName, templateFileName, outputFileName);
 
-        checkGeneratedFileContent(expectedOutputFileName);
+        checkGeneratedFileContent(outputFileName, expectedOutputFileName);
     }
 
-    private void checkGeneratedFileContent(String expectedOutputFileName) throws IOException {
+    private void checkGeneratedFileContent(String generatedFileName, String expectedOutputFileName) throws IOException {
+        Path generatedFilePath = Path.of(generatedFileName);
         Path expectedFilePath = Path.of(expectedOutputFileName);
-        Path generatedFilePath = Path.of("./target", expectedFilePath.getFileName().toString());
         String generatedFileContent = Files.readString(generatedFilePath);
         String expectedFileContent = Files.readString(expectedFilePath);
 
