@@ -4,7 +4,6 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Stack;
 
 /**
  * Usage example:
@@ -30,7 +29,7 @@ public class GithubPagesContentGenerator {
 
                 // Title of new block
                 if (line.startsWith("* ") || line.startsWith("- ")) {
-                    processTitleBlock(outputBuffer, line, pBuffer);
+                    processTitleBlock(line, pBuffer, outputBuffer);
                     continue;
                 }
 
@@ -48,11 +47,7 @@ public class GithubPagesContentGenerator {
                 continue;
             }
 
-            // Dump remaining buffer content into output file
-            if (pBuffer.length() > 0) {
-                outputBuffer.append(wrapWitnP(pBuffer.toString()));
-                pBuffer.setLength(0);   // To avoid miss this cleanup in the future
-            }
+            dumpBufferIntoOutputFile(pBuffer, outputBuffer);
 
             String templateContent = Files.readString(Path.of(templateFileName));
             return templateContent.replace(PLACEHOLDER_STRING, outputBuffer.toString());
@@ -62,15 +57,18 @@ public class GithubPagesContentGenerator {
         }
     }
 
-    private void processTitleBlock(StringBuilder outputBuffer, String line, StringBuilder pBuffer) {
-        // Dump current buffer content into output file
+    private void processTitleBlock(String line, StringBuilder pBuffer, StringBuilder outputBuffer) {
+        dumpBufferIntoOutputFile(pBuffer, outputBuffer);
+
+        // Title line
+        pBuffer.append(wrapWithB(line.substring(2)));
+    }
+
+    private void dumpBufferIntoOutputFile(StringBuilder pBuffer, StringBuilder outputBuffer) {
         if (pBuffer.length() > 0) {
             outputBuffer.append(wrapWitnP(pBuffer.toString()));
             pBuffer.setLength(0);
         }
-
-        // Title line
-        pBuffer.append(wrapWithB(line.substring(2)));
     }
 
     public void generate(String inputFileName, String templateFileName, String htmlOutputFileName) throws IOException {
@@ -101,23 +99,19 @@ public class GithubPagesContentGenerator {
         }
     }
 
-    private String wrapWithLi(String str) {
-        return String.format("<li>%s</li>\n", capitalize(str));
-    }
-
-    private String wrapWithPre(String buffer) {
-        buffer = buffer
+    private String wrapWithPre(String str) {
+        str = str
                 .replaceAll("<", "&lt;")
                 .replaceAll(">", "&gt;");
-        return String.format("<pre>\n%s</pre>\n", buffer);
+        return String.format("<pre>\n%s</pre>\n", str);
     }
 
     private String wrapWithB(String line) {
         return String.format("<b>%s</b><br/>\n", capitalize(line));
     }
 
-    private String wrapWitnP(String buffer) {
-        return String.format("<p align=\"justify\">\n%s</p>\n", buffer);
+    private String wrapWitnP(String str) {
+        return String.format("<p align=\"justify\">\n%s</p>\n", str);
     }
 
     private String capitalize(String str) {
