@@ -37,10 +37,6 @@ public class GithubPagesContentGenerator {
                         pBuffer += "\n";
                         continue;
                     }
-
-                    // Buffer is not empty
-                    writer.write(wrapWitnP(pBuffer) + "\n");
-                    pBuffer = "";
                     continue;
                 }
 
@@ -49,6 +45,12 @@ public class GithubPagesContentGenerator {
                     while (!bulletedListStartedFlagsStack.isEmpty()) {
                         pBuffer += "</ul>\n";
                         bulletedListStartedFlagsStack.pop();
+                    }
+
+                    if (!pBuffer.isEmpty()) {
+                        // Buffer is not empty
+                        writer.write(wrapWitnP(pBuffer) + "\n");
+                        pBuffer = "";
                     }
 
                     // Title line
