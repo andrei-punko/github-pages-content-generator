@@ -25,46 +25,41 @@ public class GithubPagesContentGenerator {
         ) {
             String line;
             String pBuffer = "";
-
-            Stack<String> bulletedListStartedFlagsStack = new Stack<>();
+            Stack<String> bulletedListStack = new Stack<>();
 
             while ((line = reader.readLine()) != null) {
 
                 if (line.isBlank()) {
-                    // Line is blank
-                    if (pBuffer.isBlank()) {
-                        // Buffer is empty
-                        pBuffer += "\n";
-                        continue;
-                    }
+                    pBuffer += "\n";
                     continue;
                 }
 
-                // Line is not blank
+                // Title of new block
                 if (line.startsWith("* ") || line.startsWith("- ")) {
-                    while (!bulletedListStartedFlagsStack.isEmpty()) {
+                    // End all started bulleted lists if needed
+                    while (!bulletedListStack.isEmpty()) {
                         pBuffer += "</ul>\n";
-                        bulletedListStartedFlagsStack.pop();
+                        bulletedListStack.pop();
                     }
 
+                    // Dump current buffer content into output file
                     if (!pBuffer.isEmpty()) {
-                        // Buffer is not empty
-                        writer.write(wrapWitnP(pBuffer) + "\n");
+                        writer.write(wrapWitnP(pBuffer));
                         pBuffer = "";
                     }
 
                     // Title line
-                    pBuffer += wrapWithB(line) + "<br/>\n";
+                    pBuffer += wrapWithB(line.substring(2));
                     continue;
                 }
 
+                // Start of PRE block
                 if (line.startsWith("```")) {
-                    // Start of PRE block
                     String preBuffer = "";
                     boolean preStarted = true;
                     while ((line = reader.readLine()) != null) {
+                        // End of PRE block
                         if (line.startsWith("```")) {
-                            // End of PRE block
                             pBuffer += wrapWithPre(preBuffer);
                             preStarted = false;
                             break;
@@ -72,54 +67,57 @@ public class GithubPagesContentGenerator {
 
                         preBuffer += line + "\n";
                     }
+
+                    // After end of previous while <pre> block should be ended
                     if (preStarted) {
                         throw new IllegalStateException("Ending '```' was not found!");
                     }
                     continue;
                 }
 
-                // Usual line
+                // Remove starting/ending spaces
                 line = line.trim();
+
+                // Bulleted list item
                 if (line.matches("^=+\\s.*")) {
                     String startingBulletedPart = line.substring(0, line.indexOf(" "));
-                    if (bulletedListStartedFlagsStack.isEmpty()) {
+                    if (bulletedListStack.isEmpty()) {
                         pBuffer += "<ul>\n";
-                        bulletedListStartedFlagsStack.push(startingBulletedPart);
+                        bulletedListStack.push(startingBulletedPart);
                     } else {
-                        String topStackElement = bulletedListStartedFlagsStack.peek();
+                        String topStackElement = bulletedListStack.peek();
                         if (!startingBulletedPart.equals(topStackElement)) {
                             pBuffer += "<ul>\n";
-                            bulletedListStartedFlagsStack.push(startingBulletedPart);
+                            bulletedListStack.push(startingBulletedPart);
                         }
                     }
+                    // Remove bulleted item marker from line
                     line = line.replaceFirst("^=+\\s", "");
-                    pBuffer += wrapWithLi(capitalize(line));
+                    pBuffer += wrapWithLi(line);
                     continue;
                 }
 
-                pBuffer += capitalize(line) + "<br/>" + "\n";
+                // Usual line: just write it capitalized
+                pBuffer += capitalize(line) + "<br/>\n";
                 continue;
             }
 
-            // Dump pBuffer content if it isn't empty
+            // Dump remaining buffer content into output file
             if (!pBuffer.isBlank()) {
-                while (!bulletedListStartedFlagsStack.isEmpty()) {
+                while (!bulletedListStack.isEmpty()) {
                     pBuffer += "</ul>\n";
-                    bulletedListStartedFlagsStack.pop();
+                    bulletedListStack.pop();
                 }
                 writer.write(wrapWitnP(pBuffer));
+                pBuffer = "";   // To avoid miss this cleanup in the future
             }
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
     }
 
-    private String wrapWithUl(String str) {
-        return "<ul>\n" + str + "\n</ul>\n";
-    }
-
     private String wrapWithLi(String str) {
-        return "<li>" + str + "</li>\n";
+        return "<li>" + capitalize(str) + "</li>\n";
     }
 
     private String wrapWithPre(String buffer) {
@@ -130,11 +128,11 @@ public class GithubPagesContentGenerator {
     }
 
     private String wrapWithB(String line) {
-        return "<b>" + capitalize(line.substring(2)) + "</b>";
+        return "<b>" + capitalize(line) + "</b><br/>\n";
     }
 
     private String wrapWitnP(String buffer) {
-        return "<p align=\"justify\">\n" + buffer + "</p>";
+        return "<p align=\"justify\">\n" + buffer + "</p>\n";
     }
 
     private String capitalize(String str) {
