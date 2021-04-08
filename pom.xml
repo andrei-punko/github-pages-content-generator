@@ -33,7 +33,7 @@
     </properties>
 
     <build>
-        <finalName>github-pages-parser</finalName>
+        <finalName>github-pages-content-generator</finalName>
         <plugins>
             <plugin>
                 <!-- Build an executable JAR -->
