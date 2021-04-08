@@ -21,7 +21,6 @@ public class GithubPagesContentGenerator {
         ) {
             String line;
             StringBuilder pBuffer = new StringBuilder();
-            Stack<String> bulletedListStack = new Stack<>();
 
             while ((line = inputFileReader.readLine()) != null) {
 
@@ -31,20 +30,7 @@ public class GithubPagesContentGenerator {
 
                 // Title of new block
                 if (line.startsWith("* ") || line.startsWith("- ")) {
-                    // End all started bulleted lists if needed
-                    while (!bulletedListStack.isEmpty()) {
-                        pBuffer.append("</ul>\n");
-                        bulletedListStack.pop();
-                    }
-
-                    // Dump current buffer content into output file
-                    if (pBuffer.length() > 0) {
-                        outputBuffer.append(wrapWitnP(pBuffer.toString()));
-                        pBuffer.setLength(0);
-                    }
-
-                    // Title line
-                    pBuffer.append(wrapWithB(line.substring(2)));
+                    processTitleBlock(outputBuffer, line, pBuffer);
                     continue;
                 }
 
@@ -57,30 +43,6 @@ public class GithubPagesContentGenerator {
                 // Remove starting/ending spaces
                 line = line.trim();
 
-                // Bulleted list item
-                if (line.matches("^=+\\s.*")) {
-                    String startingBulletedPart = line.substring(0, line.indexOf(" "));
-                    if (bulletedListStack.isEmpty()) {
-                        pBuffer.append("<ul>\n");
-                        bulletedListStack.push(startingBulletedPart);
-                    } else {
-                        String topStackElement = bulletedListStack.peek();
-                        if (!startingBulletedPart.equals(topStackElement)) {
-                            if (startingBulletedPart.length() > topStackElement.length()) {
-                                pBuffer.append("<ul>\n");
-                                bulletedListStack.push(startingBulletedPart);
-                            } else {
-                                pBuffer.append("</ul>\n");
-                                bulletedListStack.pop();
-                            }
-                        }
-                    }
-                    // Remove bulleted item marker from line
-                    line = line.replaceFirst("^=+\\s", "");
-                    pBuffer.append(wrapWithLi(line));
-                    continue;
-                }
-
                 // Usual line: just write it capitalized
                 pBuffer.append(capitalize(line)).append("<br/>\n");
                 continue;
@@ -88,10 +50,6 @@ public class GithubPagesContentGenerator {
 
             // Dump remaining buffer content into output file
             if (pBuffer.length() > 0) {
-                while (!bulletedListStack.isEmpty()) {
-                    pBuffer.append("</ul>\n");
-                    bulletedListStack.pop();
-                }
                 outputBuffer.append(wrapWitnP(pBuffer.toString()));
                 pBuffer.setLength(0);   // To avoid miss this cleanup in the future
             }
@@ -102,6 +60,17 @@ public class GithubPagesContentGenerator {
             ioe.printStackTrace();
             throw new IllegalStateException(ioe);
         }
+    }
+
+    private void processTitleBlock(StringBuilder outputBuffer, String line, StringBuilder pBuffer) {
+        // Dump current buffer content into output file
+        if (pBuffer.length() > 0) {
+            outputBuffer.append(wrapWitnP(pBuffer.toString()));
+            pBuffer.setLength(0);
+        }
+
+        // Title line
+        pBuffer.append(wrapWithB(line.substring(2)));
     }
 
     public void generate(String inputFileName, String templateFileName, String htmlOutputFileName) throws IOException {
