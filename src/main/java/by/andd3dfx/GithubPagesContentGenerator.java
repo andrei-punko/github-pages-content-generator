@@ -24,13 +24,13 @@ public class GithubPagesContentGenerator {
                 BufferedWriter writer = new BufferedWriter(new FileWriter(outputFileName, StandardCharsets.UTF_8));
         ) {
             String line;
-            String pBuffer = "";
+            StringBuilder pBuffer = new StringBuilder();
             Stack<String> bulletedListStack = new Stack<>();
 
             while ((line = reader.readLine()) != null) {
 
                 if (line.isBlank()) {
-                    pBuffer += "\n";
+                    pBuffer.append("\n");
                     continue;
                 }
 
@@ -38,40 +38,24 @@ public class GithubPagesContentGenerator {
                 if (line.startsWith("* ") || line.startsWith("- ")) {
                     // End all started bulleted lists if needed
                     while (!bulletedListStack.isEmpty()) {
-                        pBuffer += "</ul>\n";
+                        pBuffer.append("</ul>\n");
                         bulletedListStack.pop();
                     }
 
                     // Dump current buffer content into output file
-                    if (!pBuffer.isEmpty()) {
-                        writer.write(wrapWitnP(pBuffer));
-                        pBuffer = "";
+                    if (pBuffer.length() > 0) {
+                        writer.write(wrapWitnP(pBuffer.toString()));
+                        pBuffer.setLength(0);
                     }
 
                     // Title line
-                    pBuffer += wrapWithB(line.substring(2));
+                    pBuffer.append(wrapWithB(line.substring(2)));
                     continue;
                 }
 
                 // Start of PRE block
                 if (line.startsWith("```")) {
-                    String preBuffer = "";
-                    boolean preStarted = true;
-                    while ((line = reader.readLine()) != null) {
-                        // End of PRE block
-                        if (line.startsWith("```")) {
-                            pBuffer += wrapWithPre(preBuffer);
-                            preStarted = false;
-                            break;
-                        }
-
-                        preBuffer += line + "\n";
-                    }
-
-                    // After end of previous while <pre> block should be ended
-                    if (preStarted) {
-                        throw new IllegalStateException("Ending '```' was not found!");
-                    }
+                    processPreBlock(reader, pBuffer);
                     continue;
                 }
 
@@ -82,62 +66,83 @@ public class GithubPagesContentGenerator {
                 if (line.matches("^=+\\s.*")) {
                     String startingBulletedPart = line.substring(0, line.indexOf(" "));
                     if (bulletedListStack.isEmpty()) {
-                        pBuffer += "<ul>\n";
+                        pBuffer.append("<ul>\n");
                         bulletedListStack.push(startingBulletedPart);
                     } else {
                         String topStackElement = bulletedListStack.peek();
                         if (!startingBulletedPart.equals(topStackElement)) {
-                            pBuffer += "<ul>\n";
+                            pBuffer.append("<ul>\n");
                             bulletedListStack.push(startingBulletedPart);
                         }
                     }
                     // Remove bulleted item marker from line
                     line = line.replaceFirst("^=+\\s", "");
-                    pBuffer += wrapWithLi(line);
+                    pBuffer.append(wrapWithLi(line));
                     continue;
                 }
 
                 // Usual line: just write it capitalized
-                pBuffer += capitalize(line) + "<br/>\n";
+                pBuffer.append(capitalize(line)).append("<br/>\n");
                 continue;
             }
 
             // Dump remaining buffer content into output file
-            if (!pBuffer.isBlank()) {
+            if (pBuffer.length() > 0) {
                 while (!bulletedListStack.isEmpty()) {
-                    pBuffer += "</ul>\n";
+                    pBuffer.append("</ul>\n");
                     bulletedListStack.pop();
                 }
-                writer.write(wrapWitnP(pBuffer));
-                pBuffer = "";   // To avoid miss this cleanup in the future
+                writer.write(wrapWitnP(pBuffer.toString()));
+                pBuffer.setLength(0);   // To avoid miss this cleanup in the future
             }
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
     }
 
+    private void processPreBlock(BufferedReader reader, StringBuilder pBuffer) throws IOException {
+        String line;
+        StringBuilder preBuffer = new StringBuilder();
+        boolean preStarted = true;
+        while ((line = reader.readLine()) != null) {
+            // End of PRE block
+            if (line.startsWith("```")) {
+                pBuffer.append(wrapWithPre(preBuffer.toString()));
+                preStarted = false;
+                break;
+            }
+
+            preBuffer.append(line).append("\n");
+        }
+
+        // After end of previous while <pre> block should be ended
+        if (preStarted) {
+            throw new IllegalStateException("Ending '```' was not found!");
+        }
+    }
+
     private String wrapWithLi(String str) {
-        return "<li>" + capitalize(str) + "</li>\n";
+        return String.format("<li>%s</li>\n", capitalize(str));
     }
 
     private String wrapWithPre(String buffer) {
         buffer = buffer
                 .replaceAll("<", "&lt;")
                 .replaceAll(">", "&gt;");
-        return "<pre>\n" + buffer + "</pre>\n";
+        return String.format("<pre>\n%s</pre>\n", buffer);
     }
 
     private String wrapWithB(String line) {
-        return "<b>" + capitalize(line) + "</b><br/>\n";
+        return String.format("<b>%s</b><br/>\n", capitalize(line));
     }
 
     private String wrapWitnP(String buffer) {
-        return "<p align=\"justify\">\n" + buffer + "</p>\n";
+        return String.format("<p align=\"justify\">\n%s</p>\n", buffer);
     }
 
     private String capitalize(String str) {
         if (str.startsWith("http://") || str.startsWith("https://")) {
-            return "<a href=\"" + str + "\">" + str + "</a>";
+            return String.format("<a href=\"%s\">%s</a>", str, str);
         }
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
