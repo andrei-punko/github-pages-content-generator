@@ -4,4 +4,4 @@
 
 Used for several sites already:
 - https://github.com/andrei-punko/saint-fathers-citations
-- https://github.com/andrei-punko/java-interview-q-n-a
+- https://andrei-punko.github.io/java-interview-faq-n-answers
