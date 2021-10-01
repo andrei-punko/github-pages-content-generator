@@ -26,6 +26,7 @@ public class GithubPagesContentGenerator {
             while ((line = inputFileReader.readLine()) != null) {
 
                 if (line.isBlank()) {
+                    dumpBufferIntoOutputFile(pBuffer, outputBuffer);
                     continue;
                 }
 
@@ -70,7 +71,7 @@ public class GithubPagesContentGenerator {
 
     private void processUsualLine(String line, StringBuilder pBuffer) {
         // Remove starting/ending spaces
-        line = line.trim();
+        // line = line.trim();
 
         // Usual line: just write it capitalized
         pBuffer.append(capitalize(line)).append("<br/>\n");
