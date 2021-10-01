@@ -66,7 +66,7 @@ public class GithubPagesContentGenerator {
     }
 
     private void processPageTitleBlock(String line, StringBuilder pBuffer, StringBuilder outputBuffer) {
-        pBuffer.append(wrapWitH1(line.substring(3)));
+        outputBuffer.append(wrapWitH1(line.substring(3)));
     }
 
     private void processUsualLine(String line, StringBuilder pBuffer) {
