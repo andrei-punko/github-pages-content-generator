@@ -11,9 +11,11 @@ import java.nio.file.Path;
  */
 public class GithubPagesContentGenerator {
 
+    private static final String TITLE_PLACEHOLDER = "***TITLE_PLACEHOLDER***";
     private static final String PLACEHOLDER_STRING = "***CONTENT_PLACEHOLDER***";
 
     public String generate(String inputFileName, String templateFileName) throws IOException {
+        String title = "";
         StringBuilder outputBuffer = new StringBuilder();
         try (
                 BufferedReader inputFileReader = new BufferedReader(new FileReader(inputFileName, StandardCharsets.UTF_8));
@@ -24,6 +26,16 @@ public class GithubPagesContentGenerator {
             while ((line = inputFileReader.readLine()) != null) {
 
                 if (line.isBlank()) {
+                    continue;
+                }
+
+                if (line.startsWith("! ")) {
+                    title = line.substring(2);
+                    continue;
+                }
+
+                if (line.startsWith("** ")) {
+                    processPageTitleBlock(line, pBuffer, outputBuffer);
                     continue;
                 }
 
@@ -46,8 +58,14 @@ public class GithubPagesContentGenerator {
             dumpBufferIntoOutputFile(pBuffer, outputBuffer);
 
             String templateContent = Files.readString(Path.of(templateFileName));
-            return templateContent.replace(PLACEHOLDER_STRING, outputBuffer.toString());
+            return templateContent
+                    .replace(TITLE_PLACEHOLDER, title)
+                    .replace(PLACEHOLDER_STRING, outputBuffer.toString());
         }
+    }
+
+    private void processPageTitleBlock(String line, StringBuilder pBuffer, StringBuilder outputBuffer) {
+        pBuffer.append(wrapWitH1(line.substring(3)));
     }
 
     private void processUsualLine(String line, StringBuilder pBuffer) {
@@ -98,6 +116,10 @@ public class GithubPagesContentGenerator {
         if (preStarted) {
             throw new IllegalStateException("Ending '```' was not found!");
         }
+    }
+
+    private String wrapWitH1(String substring) {
+        return String.format("<h1>%s</h1><hr/>\n", substring);
     }
 
     private String wrapWithPre(String str) {
