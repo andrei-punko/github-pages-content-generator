@@ -3,6 +3,7 @@
 
 [![Java CI with Maven](https://github.com/andrei-punko/github-pages-content-generator/actions/workflows/maven.yml/badge.svg)](https://github.com/andrei-punko/github-pages-content-generator/actions/workflows/maven.yml)
 [![Coverage](.github/badges/jacoco.svg)](jacoco.svg)
+[![Branches](.github/badges/branches.svg)](branches.svg)
 
 Used for several sites already:
 - https://github.com/andrei-punko/saint-fathers-citations
