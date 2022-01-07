@@ -1,15 +1,30 @@
 
-# Parser to prepare content for GitHub Pages
+# Generator to prepare content for GitHub Pages
 
-[![Java CI with Maven](https://github.com/andrei-punko/github-pages-content-generator/actions/workflows/maven.yml/badge.svg)](https://github.com/andrei-punko/github-pages-content-generator/actions/workflows/maven.yml)
-[![Coverage](.github/badges/jacoco.svg)](https://github.com/andrei-punko/github-pages-content-generator/actions/workflows/maven.yml)
-[![Branches](.github/badges/branches.svg)](https://github.com/andrei-punko/github-pages-content-generator/actions/workflows/maven.yml)
+[![Java CI with Maven](https://github.com/andrei-punko/github-pages-content-generator/actions/workflows/maven.yml/badge.svg)](actions/workflows/maven.yml)
+[![Coverage](.github/badges/jacoco.svg)](actions/workflows/maven.yml)
+[![Branches](.github/badges/branches.svg)](actions/workflows/maven.yml)
+
+Output html generated from text file using template
 
 Used for several sites already:
 - https://github.com/andrei-punko/saint-fathers-citations
-- https://andrei-punko.github.io/java-interview-faq-n-answers
+- https://github.com/andrei-punko/java-interview-faq-n-answers
 
-## Usage instruction
+## Prerequisites
+
+- JDK 11
+- Maven 3
+
+## Usage instructions
+
+Build generator jar:
+
+    mvn clean install
+
+Prepare input text file and html template
+
+Use prepared jar to generate output html:
 
     java -jar github-pages-content-generator.jar inputFileName templateFileName htmlOutputFileName
 
