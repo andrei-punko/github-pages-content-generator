@@ -36,7 +36,12 @@ public class GithubPagesContentGenerator {
                 }
 
                 if (line.startsWith("** ")) {
-                    processPageTitleBlock(line, pBuffer, outputBuffer);
+                    processH1Block(line, pBuffer, outputBuffer);
+                    continue;
+                }
+
+                if (line.startsWith("*** ")) {
+                    processH2Block(line, pBuffer, outputBuffer);
                     continue;
                 }
 
@@ -65,8 +70,12 @@ public class GithubPagesContentGenerator {
         }
     }
 
-    private void processPageTitleBlock(String line, StringBuilder pBuffer, StringBuilder outputBuffer) {
+    private void processH1Block(String line, StringBuilder pBuffer, StringBuilder outputBuffer) {
         outputBuffer.append(wrapWitH1(line.substring(3)));
+    }
+
+    private void processH2Block(String line, StringBuilder pBuffer, StringBuilder outputBuffer) {
+        outputBuffer.append(wrapWitH2(line.substring(4)));
     }
 
     private void processUsualLine(String line, StringBuilder pBuffer) {
@@ -121,6 +130,10 @@ public class GithubPagesContentGenerator {
 
     private String wrapWitH1(String substring) {
         return String.format("<h1>%s</h1><hr/>\n", substring);
+    }
+
+    private String wrapWitH2(String substring) {
+        return String.format("<h2>%s</h2><hr/>\n", substring);
     }
 
     private String wrapWithPre(String str) {
