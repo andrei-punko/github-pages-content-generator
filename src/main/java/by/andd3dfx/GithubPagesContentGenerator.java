@@ -60,7 +60,6 @@ public class GithubPagesContentGenerator {
                 }
 
                 processUsualLine(line, pBuffer);
-                continue;
             }
 
             dumpBufferIntoOutputFile(pBuffer, outputBuffer);
@@ -145,8 +144,11 @@ public class GithubPagesContentGenerator {
         return String.format("<pre>\n%s</pre>\n", str);
     }
 
+    private int linkCounter = 0;
+
     private String wrapWithB(String line) {
-        return String.format("<b>%s</b><br/>\n", capitalize(line));
+        linkCounter++;
+        return String.format("<b id=\"q%d\">%s</b>&nbsp;<a href=\"#q%d\">link</a><br/>\n", linkCounter, capitalize(line), linkCounter);
     }
 
     private String wrapWithP(String str) {
