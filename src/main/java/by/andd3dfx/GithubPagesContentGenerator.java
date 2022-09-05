@@ -5,6 +5,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * Usage example:
  * java -jar github-pages-content-generator.jar inputFileName templateFileName htmlOutputFileName
@@ -18,7 +20,7 @@ public class GithubPagesContentGenerator {
         String title = "";
         StringBuilder outputBuffer = new StringBuilder();
         try (
-                BufferedReader inputFileReader = new BufferedReader(new FileReader(inputFileName, StandardCharsets.UTF_8));
+                BufferedReader inputFileReader = new BufferedReader(new FileReader(inputFileName, UTF_8));
         ) {
             String line;
             StringBuilder pBuffer = new StringBuilder();
@@ -95,13 +97,13 @@ public class GithubPagesContentGenerator {
 
     private void dumpBufferIntoOutputFile(StringBuilder pBuffer, StringBuilder outputBuffer) {
         if (pBuffer.length() > 0) {
-            outputBuffer.append(wrapWitnP(pBuffer.toString()));
+            outputBuffer.append(wrapWithP(pBuffer.toString()));
             pBuffer.setLength(0);
         }
     }
 
     public void generate(String inputFileName, String templateFileName, String htmlOutputFileName) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(htmlOutputFileName, StandardCharsets.UTF_8));) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(htmlOutputFileName, UTF_8));) {
             String content = generate(inputFileName, templateFileName);
             writer.write(content);
         }
@@ -147,7 +149,7 @@ public class GithubPagesContentGenerator {
         return String.format("<b>%s</b><br/>\n", capitalize(line));
     }
 
-    private String wrapWitnP(String str) {
+    private String wrapWithP(String str) {
         return String.format("<p align=\"justify\">\n%s</p>\n", str);
     }
 
