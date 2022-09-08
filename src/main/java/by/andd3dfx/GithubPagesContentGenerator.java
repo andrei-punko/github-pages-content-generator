@@ -148,7 +148,9 @@ public class GithubPagesContentGenerator {
 
     private String wrapWithB(String line) {
         linkCounter++;
-        return String.format("<b id=\"q%d\">%s</b>&nbsp;<a href=\"#q%d\">⬅</a><br/>\n", linkCounter, capitalize(line), linkCounter);
+        return String.format("<b id=\"q%d\">%s</b>&nbsp;" +
+                        "<a href=\"#q%d\" style=\"text-decoration:none\">\uD83D\uDD17</a><br/>\n",
+                linkCounter, capitalize(line), linkCounter);
     }
 
     private String wrapWithP(String str) {
