@@ -138,7 +138,7 @@ public class GithubPagesContentGenerator {
     }
 
     private String wrapWithImg(String substring) {
-        return String.format("<img src=\"%s\">\n", substring);
+        return String.format("<img src=\"%s\"><br/>\n", substring);
     }
 
     private String wrapWitH1(String substring) {
