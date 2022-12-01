@@ -1,7 +1,6 @@
 package by.andd3dfx;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -59,6 +58,11 @@ public class GithubPagesContentGenerator {
                     continue;
                 }
 
+                if (line.startsWith("IMG")) {
+                    processImageBlock(line, outputBuffer);
+                    continue;
+                }
+
                 processUsualLine(line, pBuffer);
             }
 
@@ -69,6 +73,10 @@ public class GithubPagesContentGenerator {
                     .replace(TITLE_PLACEHOLDER, title)
                     .replace(PLACEHOLDER_STRING, outputBuffer.toString());
         }
+    }
+
+    private void processImageBlock(String line, StringBuilder outputBuffer) {
+        outputBuffer.append(wrapWithImg(line.replaceFirst("IMG\\s+", "")));
     }
 
     private void processH1Block(String line, StringBuilder pBuffer, StringBuilder outputBuffer) {
@@ -127,6 +135,10 @@ public class GithubPagesContentGenerator {
         if (preStarted) {
             throw new IllegalStateException("Ending '```' was not found!");
         }
+    }
+
+    private String wrapWithImg(String substring) {
+        return String.format("<img src=\"%s\">\n", substring);
     }
 
     private String wrapWitH1(String substring) {
