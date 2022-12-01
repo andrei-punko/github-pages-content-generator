@@ -59,7 +59,7 @@ public class GithubPagesContentGenerator {
                 }
 
                 if (line.startsWith("IMG")) {
-                    processImageBlock(line, outputBuffer);
+                    processImageBlock(line, pBuffer, outputBuffer);
                     continue;
                 }
 
@@ -75,8 +75,8 @@ public class GithubPagesContentGenerator {
         }
     }
 
-    private void processImageBlock(String line, StringBuilder outputBuffer) {
-        outputBuffer.append(wrapWithImg(line.replaceFirst("IMG\\s+", "")));
+    private void processImageBlock(String line, StringBuilder pBuffer, StringBuilder outputBuffer) {
+        pBuffer.append(wrapWithImg(line.replaceFirst("IMG\\s+", "")));
     }
 
     private void processH1Block(String line, StringBuilder pBuffer, StringBuilder outputBuffer) {
