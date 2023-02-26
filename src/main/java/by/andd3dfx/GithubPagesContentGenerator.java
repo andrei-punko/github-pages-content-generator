@@ -156,10 +156,8 @@ public class GithubPagesContentGenerator {
         return String.format("<pre>\n%s</pre>\n", str);
     }
 
-    private int linkCounter = 0;
-
     private String wrapWithB(String line) {
-        linkCounter++;
+        int linkCounter = line.hashCode();
         return String.format("<b id=\"q%d\">%s</b>&nbsp;" +
                         "<a href=\"#q%d\" style=\"text-decoration:none\">\uD83D\uDD17</a><br/>\n",
                 linkCounter, capitalize(line), linkCounter);
