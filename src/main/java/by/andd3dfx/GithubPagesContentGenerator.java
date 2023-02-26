@@ -67,6 +67,7 @@ public class GithubPagesContentGenerator {
             }
 
             dumpBufferIntoOutputFile(pBuffer, outputBuffer);
+            System.out.printf("Links generated: %d%n", linkCounter);
 
             String templateContent = Files.readString(Path.of(templateFileName));
             return templateContent
@@ -156,11 +157,14 @@ public class GithubPagesContentGenerator {
         return String.format("<pre>\n%s</pre>\n", str);
     }
 
+    private int linkCounter = 0;
+
     private String wrapWithB(String line) {
-        int linkCounter = line.hashCode();
+        linkCounter++;
+        int linkNumber = line.hashCode();
         return String.format("<b id=\"q%d\">%s</b>&nbsp;" +
                         "<a href=\"#q%d\" style=\"text-decoration:none\">\uD83D\uDD17</a><br/>\n",
-                linkCounter, capitalize(line), linkCounter);
+                linkNumber, capitalize(line), linkNumber);
     }
 
     private String wrapWithP(String str) {
