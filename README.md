@@ -13,8 +13,8 @@ Used for several sites already:
 
 ## Prerequisites
 
-- JDK 11
 - Maven 3
+- JDK 17
 
 ## Usage instructions
 
