@@ -93,6 +93,9 @@ public class GithubPagesContentGenerator {
         // line = line.trim();
 
         // Usual line: just write it capitalized
+        line = line
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;");
         pBuffer.append(capitalize(line)).append("<br/>\n");
     }
 
