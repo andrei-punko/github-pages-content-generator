@@ -171,7 +171,7 @@ public class GithubPagesContentGenerator {
     }
 
     private String wrapWithP(String str) {
-        return String.format("<p align=\"justify\">\n%s</p>\n", str);
+        return String.format("<p style=\"text-align:justify\">\n%s</p>\n", str);
     }
 
     private String capitalize(String str) {
