@@ -12,47 +12,46 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class GithubPagesContentGeneratorTest {
 
-    private GithubPagesContentGenerator parser;
+    private final String TEST_RESOURCES_PATH = "./src/test/resources/";
+    private final String INPUT_FILE_NAME = TEST_RESOURCES_PATH + "input.txt";
+    private final String TEMPLATE_FILE_NAME = TEST_RESOURCES_PATH + "template.html";
+    private final String EXPECTED_OUTPUT_FILE_NAME = TEST_RESOURCES_PATH + "expected-output.html";
+
+    private GithubPagesContentGenerator generator;
 
     @Before
     public void setUp() {
-        parser = new GithubPagesContentGenerator();
+        generator = new GithubPagesContentGenerator();
     }
 
     @Test
-    public void generate() throws IOException {
-        String inputFileName = "./src/test/resources/input.txt";
-        String templateFileName = "./src/test/resources/template.html";
-        String expectedGeneratedContent = Files.readString(Path.of("./src/test/resources/output.html"));
+    public void generateIntoString() throws IOException {
+        var content = generator.generate(INPUT_FILE_NAME, TEMPLATE_FILE_NAME);
 
-        String content = parser.generate(inputFileName, templateFileName);
-
-        assertThat(content, is(expectedGeneratedContent));
+        String expectedContent = Files.readString(Path.of(EXPECTED_OUTPUT_FILE_NAME));
+        assertThat(content, is(expectedContent));
     }
 
     @Test
-    public void generateByTemplate() throws IOException {
-        String inputFileName = "./src/test/resources/input.txt";
-        String templateFileName = "./src/test/resources/template.html";
-        String expectedOutputFileName = "./src/test/resources/output.html";
-        String outputFileName = "./target/output.html";
+    public void generateIntoFile() throws IOException {
+        String outputFileName = "./target/expected-output.html";
 
-        parser.generate(inputFileName, templateFileName, outputFileName);
+        var content = generator.generate(INPUT_FILE_NAME, TEMPLATE_FILE_NAME, outputFileName);
 
-        checkGeneratedFileContent(outputFileName, expectedOutputFileName);
+        String expectedContent = Files.readString(Path.of(EXPECTED_OUTPUT_FILE_NAME));
+        assertThat(content, is(expectedContent));
+        checkGeneratedFileContent(outputFileName, EXPECTED_OUTPUT_FILE_NAME);
     }
 
     private void checkGeneratedFileContent(String generatedFileName, String expectedOutputFileName) throws IOException {
         Path generatedFilePath = Path.of(generatedFileName);
+        String[] generatedFileLines = Files.readString(generatedFilePath).split("\n");
+
         Path expectedFilePath = Path.of(expectedOutputFileName);
-        String generatedFileContent = Files.readString(generatedFilePath);
-        String expectedFileContent = Files.readString(expectedFilePath);
+        String[] expectedFileLines = Files.readString(expectedFilePath).split("\n");
 
-        String[] generatedFileLines = generatedFileContent.split("\n");
-        String[] expectedFileLines = expectedFileContent.split("\n");
-
-        assertThat("Unexpected amount of lines in file " + generatedFilePath, generatedFileLines.length,
-                is(expectedFileLines.length));
+        assertThat("Unexpected amount of lines in file " + generatedFilePath,
+                generatedFileLines.length, is(expectedFileLines.length));
 
         for (int i = 0; i < generatedFileLines.length; i++) {
             assertThat("Wrong file content for file " + generatedFilePath,

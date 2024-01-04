@@ -19,7 +19,7 @@ public class GithubPagesContentGenerator {
         String title = "";
         StringBuilder outputBuffer = new StringBuilder();
         try (
-                BufferedReader inputFileReader = new BufferedReader(new FileReader(inputFileName, UTF_8));
+                var inputFileReader = new BufferedReader(new FileReader(inputFileName, UTF_8));
         ) {
             String line;
             StringBuilder pBuffer = new StringBuilder();
@@ -59,7 +59,7 @@ public class GithubPagesContentGenerator {
                 }
 
                 if (line.startsWith("IMG")) {
-                    processImageBlock(line, pBuffer, outputBuffer);
+                    processImageBlock(line, pBuffer);
                     continue;
                 }
 
@@ -76,7 +76,7 @@ public class GithubPagesContentGenerator {
         }
     }
 
-    private void processImageBlock(String line, StringBuilder pBuffer, StringBuilder outputBuffer) {
+    private void processImageBlock(String line, StringBuilder pBuffer) {
         pBuffer.append(wrapWithImg(line.replaceFirst("IMG\\s+", "")));
     }
 
@@ -113,10 +113,11 @@ public class GithubPagesContentGenerator {
         }
     }
 
-    public void generate(String inputFileName, String templateFileName, String htmlOutputFileName) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(htmlOutputFileName, UTF_8));) {
+    public String generate(String inputFileName, String templateFileName, String htmlOutputFileName) throws IOException {
+        try (var writer = new BufferedWriter(new FileWriter(htmlOutputFileName, UTF_8));) {
             String content = generate(inputFileName, templateFileName);
             writer.write(content);
+            return content;
         }
     }
 
@@ -183,14 +184,15 @@ public class GithubPagesContentGenerator {
 
     public static void main(String[] args) throws IOException {
         if (args.length != 3) {
-            throw new IllegalArgumentException("Wrong amount of incoming params: inputFileName, templateFileName and htmlOutputFileName should be populated!");
+            throw new IllegalArgumentException("Wrong amount of incoming params: " +
+                    "inputFileName, templateFileName and htmlOutputFileName should be populated!");
         }
 
         String inputFileName = args[0];
         String templateFileName = args[1];
         String htmlOutputFileName = args[2];
 
-        GithubPagesContentGenerator generator = new GithubPagesContentGenerator();
-        generator.generate(inputFileName, templateFileName, htmlOutputFileName);
+        new GithubPagesContentGenerator()
+                .generate(inputFileName, templateFileName, htmlOutputFileName);
     }
 }
