@@ -13,14 +13,14 @@ Used for several sites already:
 
 ## Prerequisites
 
-- Maven 3
 - JDK 17
+- Maven isn't required because of embedded Maven presence in the project
 
 ## Usage instructions
 
 Build generator jar:
 
-    mvn clean install
+    ./mvnw clean install
 
 Prepare input text file and html template
 
