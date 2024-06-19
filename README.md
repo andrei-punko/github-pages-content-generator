@@ -13,7 +13,7 @@ Used for several sites already:
 
 ## Prerequisites
 
-- JDK 17
+- JDK 21
 - Maven isn't required because of embedded Maven presence in the project
 
 ## Usage instructions
