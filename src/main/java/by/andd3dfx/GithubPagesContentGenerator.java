@@ -1,8 +1,15 @@
 package by.andd3dfx;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -14,6 +21,7 @@ public class GithubPagesContentGenerator {
 
     private static final String TITLE_PLACEHOLDER = "***TITLE_PLACEHOLDER***";
     private static final String PLACEHOLDER_STRING = "***CONTENT_PLACEHOLDER***";
+    private Map<String, Integer> headerToAmountMap = new HashMap<>();
 
     public String generate(String inputFileName, String templateFileName) throws IOException {
         String title = "";
@@ -165,10 +173,20 @@ public class GithubPagesContentGenerator {
 
     private String wrapWithB(String line) {
         linkCounter++;
-        int linkNumber = line.hashCode();
+        int linkId = determineLinkId(line);
         return String.format("<b id=\"q%d\">%s</b>&nbsp;" +
                         "<a href=\"#q%d\" style=\"text-decoration:none\">\uD83D\uDD17</a><br/>\n",
-                linkNumber, capitalize(line), linkNumber);
+                linkId, capitalize(line), linkId);
+    }
+
+    private int determineLinkId(String line) {
+        if (headerToAmountMap.containsKey(line)) {
+            headerToAmountMap.put(line, headerToAmountMap.get(line) + 1);
+            return Objects.hash(line, headerToAmountMap.get(line));
+        }
+
+        headerToAmountMap.put(line, 1);
+        return line.hashCode();
     }
 
     private String wrapWithP(String str) {
