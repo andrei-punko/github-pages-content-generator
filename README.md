@@ -1,4 +1,3 @@
-
 # Generator to prepare content for GitHub Pages
 
 [![Java CI with Maven](https://github.com/andrei-punko/github-pages-content-generator/actions/workflows/maven.yml/badge.svg)](actions/workflows/maven.yml)
@@ -8,6 +7,7 @@
 Output html generated from text file using template
 
 Used for several sites already:
+
 - https://github.com/andrei-punko/saint-fathers-citations
 - https://github.com/andrei-punko/java-interview-faq-n-answers
 
