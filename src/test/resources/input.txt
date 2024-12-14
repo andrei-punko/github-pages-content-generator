@@ -43,6 +43,9 @@ public class Singleton {		// Synchronized Accessor
 </one>
 ```
 
+- Преобразовать список списков строк в список строк: List<List<String>> ---> List<String>
+bla-bla
+
 * Bulleted list
 = one
 bla-bla

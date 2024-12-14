@@ -114,7 +114,7 @@ public class GithubPagesContentGenerator {
         dumpBufferIntoOutputFile(pBuffer, outputBuffer);
 
         // Title line
-        pBuffer.append(wrapWithB(line.substring(2)));
+        pBuffer.append(wrapWithB(escapeAngleBrackets(line.substring(2))));
     }
 
     private void dumpBufferIntoOutputFile(StringBuilder pBuffer, StringBuilder outputBuffer) {
@@ -165,11 +165,14 @@ public class GithubPagesContentGenerator {
         return String.format("<h2>%s</h2><hr/>\n", substring);
     }
 
-    private String wrapWithPre(String str) {
-        str = str
+    private String escapeAngleBrackets(String str) {
+        return str
                 .replaceAll("<", "&lt;")
                 .replaceAll(">", "&gt;");
-        return String.format("<pre>\n%s</pre>\n", str);
+    }
+
+    private String wrapWithPre(String str) {
+        return String.format("<pre>\n%s</pre>\n", escapeAngleBrackets(str));
     }
 
     private int linkCounter = 0;
