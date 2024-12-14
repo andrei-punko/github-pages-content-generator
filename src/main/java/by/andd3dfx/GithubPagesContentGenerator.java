@@ -1,10 +1,13 @@
 package by.andd3dfx;
 
+import lombok.SneakyThrows;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -193,9 +196,11 @@ public class GithubPagesContentGenerator {
         return String.format("<p style=\"text-align:justify\">\n%s</p>\n", str);
     }
 
+    @SneakyThrows
     private String capitalize(String str) {
         if (str.startsWith("http://") || str.startsWith("https://")) {
-            return String.format("<a href=\"%s\">%s</a>", str, str);
+            var decoded = URLDecoder.decode(str, "UTF-8");
+            return String.format("<a href=\"%s\">%s</a>", decoded, decoded);
         }
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
