@@ -1,7 +1,7 @@
 package by.andd3dfx;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,7 +19,7 @@ public class GithubPagesContentGeneratorTest {
 
     private GithubPagesContentGenerator generator;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         generator = new GithubPagesContentGenerator();
     }
