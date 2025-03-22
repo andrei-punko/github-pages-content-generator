@@ -25,6 +25,7 @@ public class GithubPagesContentGenerator {
     private static final String TITLE_PLACEHOLDER = "***TITLE_PLACEHOLDER***";
     private static final String PLACEHOLDER_STRING = "***CONTENT_PLACEHOLDER***";
     private Map<String, Integer> headerToAmountMap = new HashMap<>();
+    private String currentTags = "EMPTY";
 
     public String generate(String inputFileName, String templateFileName) throws IOException {
         String title = "";
@@ -63,14 +64,19 @@ public class GithubPagesContentGenerator {
                     continue;
                 }
 
-                // Start of PRE block
+                // Start of CODE block
                 if (line.startsWith("```")) {
-                    processPreBlock(inputFileReader, pBuffer);
+                    processCodeBlock(inputFileReader, pBuffer);
                     continue;
                 }
 
                 if (line.startsWith("IMG")) {
                     processImageBlock(line, pBuffer);
+                    continue;
+                }
+
+                if (line.startsWith("[")) {
+                    currentTags = line.substring(1, line.length() - 1);
                     continue;
                 }
 
@@ -118,7 +124,7 @@ public class GithubPagesContentGenerator {
     }
 
     private void dumpBufferIntoOutputFile(StringBuilder pBuffer, StringBuilder outputBuffer) {
-        if (pBuffer.length() > 0) {
+        if (!pBuffer.isEmpty()) {
             outputBuffer.append(wrapWithP(pBuffer.toString()));
             pBuffer.setLength(0);
         }
@@ -132,23 +138,23 @@ public class GithubPagesContentGenerator {
         }
     }
 
-    private void processPreBlock(BufferedReader reader, StringBuilder pBuffer) throws IOException {
+    private void processCodeBlock(BufferedReader reader, StringBuilder pBuffer) throws IOException {
         String line;
-        StringBuilder preBuffer = new StringBuilder();
-        boolean preStarted = true;
+        StringBuilder codeTagBuffer = new StringBuilder();
+        boolean codeTagStarted = true;
         while ((line = reader.readLine()) != null) {
-            // End of PRE block
+            // End of CODE block
             if (line.startsWith("```")) {
-                pBuffer.append(wrapWithPre(preBuffer.toString()));
-                preStarted = false;
+                pBuffer.append(wrapWithCode(codeTagBuffer.toString()));
+                codeTagStarted = false;
                 break;
             }
 
-            preBuffer.append(line).append("\n");
+            codeTagBuffer.append(line).append("\n");
         }
 
-        // After end of previous while <pre> block should be ended
-        if (preStarted) {
+        // After end of previous while <code> block should be ended
+        if (codeTagStarted) {
             throw new IllegalStateException("Ending '```' was not found!");
         }
     }
@@ -171,8 +177,8 @@ public class GithubPagesContentGenerator {
                 .replaceAll(">", "&gt;");
     }
 
-    private String wrapWithPre(String str) {
-        return String.format("<pre>\n%s</pre>\n", escapeAngleBrackets(str));
+    private String wrapWithCode(String str) {
+        return String.format("<code>\n%s</code>\n", escapeAngleBrackets(str));
     }
 
     private int linkCounter = 0;
@@ -196,13 +202,13 @@ public class GithubPagesContentGenerator {
     }
 
     private String wrapWithP(String str) {
-        return String.format("<p style=\"text-align:justify\">\n%s</p>\n", str);
+        return String.format("<p style=\"text-align:justify\" tags=\""+currentTags+"\">\n%s</p>\n", str);
     }
 
     @SneakyThrows
     private String capitalize(String str) {
         if (str.startsWith("http://") || str.startsWith("https://")) {
-            var decoded = URLDecoder.decode(str, "UTF-8");
+            var decoded = URLDecoder.decode(str, UTF_8);
             return String.format("<a href=\"%s\">%s</a>", decoded, decoded);
         }
         return str.substring(0, 1).toUpperCase() + str.substring(1);

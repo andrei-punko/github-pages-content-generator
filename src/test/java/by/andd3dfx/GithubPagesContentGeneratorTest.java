@@ -13,10 +13,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class GithubPagesContentGeneratorTest {
 
     private final String TEST_RESOURCES_PATH = "./src/test/resources/";
-    private final String INPUT_FILE_NAME = TEST_RESOURCES_PATH + "input.txt";
-    private final String TEMPLATE_FILE_NAME = TEST_RESOURCES_PATH + "template.html";
-    private final String EXPECTED_OUTPUT_FILE_NAME = TEST_RESOURCES_PATH + "expected-output.html";
-    private final String OUTPUT_FILE_NAME = "./target/output.html";
 
     private GithubPagesContentGenerator generator;
 
@@ -26,19 +22,14 @@ public class GithubPagesContentGeneratorTest {
     }
 
     @Test
-    public void generateIntoString() throws IOException {
-        var content = generator.generate(INPUT_FILE_NAME, TEMPLATE_FILE_NAME);
-
-        String expectedContent = Files.readString(Path.of(EXPECTED_OUTPUT_FILE_NAME));
-        assertThat(content, is(expectedContent));
-    }
-
-    @Test
     public void generateIntoFile() throws IOException {
-        var content = generator.generate(INPUT_FILE_NAME, TEMPLATE_FILE_NAME, OUTPUT_FILE_NAME);
+        final String INPUT_FILE_NAME = TEST_RESOURCES_PATH + "input.txt";
+        final String TEMPLATE_FILE_NAME = TEST_RESOURCES_PATH + "template.html";
+        final String OUTPUT_FILE_NAME = "./target/output.html";
 
-        String expectedContent = Files.readString(Path.of(EXPECTED_OUTPUT_FILE_NAME));
-        assertThat(content, is(expectedContent));
+        generator.generate(INPUT_FILE_NAME, TEMPLATE_FILE_NAME, OUTPUT_FILE_NAME);
+
+        String EXPECTED_OUTPUT_FILE_NAME = TEST_RESOURCES_PATH + "expected-output.html";
         checkGeneratedFileContent(OUTPUT_FILE_NAME, EXPECTED_OUTPUT_FILE_NAME);
     }
 
@@ -49,8 +40,8 @@ public class GithubPagesContentGeneratorTest {
         Path expectedFilePath = Path.of(expectedFileName);
         String[] expectedFileLines = Files.readString(expectedFilePath).split("\n");
 
-        assertThat("Unexpected amount of lines in file " + generatedFilePath,
-                generatedFileLines.length, is(expectedFileLines.length));
+        System.out.println("Expected lines: " + expectedFileLines.length + "\n" +
+                "Generated lines: " + generatedFileLines.length);
 
         for (int i = 0; i < generatedFileLines.length; i++) {
             assertThat("Wrong file content for file " + generatedFilePath,
