@@ -16,6 +16,7 @@ public class GithubPagesContentGeneratorTest {
     private final String INPUT_FILE_NAME = TEST_RESOURCES_PATH + "input.txt";
     private final String TEMPLATE_FILE_NAME = TEST_RESOURCES_PATH + "template.html";
     private final String EXPECTED_OUTPUT_FILE_NAME = TEST_RESOURCES_PATH + "expected-output.html";
+    private final String OUTPUT_FILE_NAME = "./target/output.html";
 
     private GithubPagesContentGenerator generator;
 
@@ -34,20 +35,18 @@ public class GithubPagesContentGeneratorTest {
 
     @Test
     public void generateIntoFile() throws IOException {
-        String outputFileName = "./target/expected-output.html";
-
-        var content = generator.generate(INPUT_FILE_NAME, TEMPLATE_FILE_NAME, outputFileName);
+        var content = generator.generate(INPUT_FILE_NAME, TEMPLATE_FILE_NAME, OUTPUT_FILE_NAME);
 
         String expectedContent = Files.readString(Path.of(EXPECTED_OUTPUT_FILE_NAME));
         assertThat(content, is(expectedContent));
-        checkGeneratedFileContent(outputFileName, EXPECTED_OUTPUT_FILE_NAME);
+        checkGeneratedFileContent(OUTPUT_FILE_NAME, EXPECTED_OUTPUT_FILE_NAME);
     }
 
-    private void checkGeneratedFileContent(String generatedFileName, String expectedOutputFileName) throws IOException {
+    private void checkGeneratedFileContent(String generatedFileName, String expectedFileName) throws IOException {
         Path generatedFilePath = Path.of(generatedFileName);
         String[] generatedFileLines = Files.readString(generatedFilePath).split("\n");
 
-        Path expectedFilePath = Path.of(expectedOutputFileName);
+        Path expectedFilePath = Path.of(expectedFileName);
         String[] expectedFileLines = Files.readString(expectedFilePath).split("\n");
 
         assertThat("Unexpected amount of lines in file " + generatedFilePath,
