@@ -178,7 +178,7 @@ public class GithubPagesContentGenerator {
     }
 
     private String wrapWithCode(String str) {
-        return String.format("<code>\n%s</code>\n", escapeAngleBrackets(str));
+        return String.format("<code>%s</code>\n", escapeAngleBrackets(str));
     }
 
     private int linkCounter = 0;
