@@ -186,9 +186,8 @@ public class GithubPagesContentGenerator {
     private String wrapWithB(String line) {
         linkCounter++;
         int linkId = determineLinkId(line);
-        return String.format("<b id=\"q%d\">%s</b>&nbsp;" +
-                        "<a href=\"#q%d\" style=\"text-decoration:none\">\uD83D\uDD17</a><br/>\n",
-                linkId, capitalize(line), linkId);
+        return String.format("<a href=\"#q%d\" id=\"q%d\" class=\"a-title\">%s</a><br/>\n",
+                linkId, linkId, capitalize(line));
     }
 
     private int determineLinkId(String line) {
