@@ -13,23 +13,20 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>21</java.version>
-        <lombok.version>1.18.34</lombok.version>
-        <junit.version>5.10.2</junit.version>
-        <jacoco.version>0.8.11</jacoco.version>
-        <hamcrest.version>2.2</hamcrest.version>
+        <lombok.version>1.18.38</lombok.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>${junit.version}</version>
+            <version>5.12.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest</artifactId>
-            <version>${hamcrest.version}</version>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.26.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -63,7 +60,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.4.1</version>
+                <version>3.4.2</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -78,7 +75,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>${jacoco.version}</version>
+                <version>0.8.13</version>
                 <executions>
                     <execution>
                         <goals>

@@ -7,8 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class GithubPagesContentGeneratorTest {
 
@@ -44,8 +43,9 @@ public class GithubPagesContentGeneratorTest {
                 "Generated lines: " + generatedFileLines.length);
 
         for (int i = 0; i < generatedFileLines.length; i++) {
-            assertThat("Wrong file content for file " + generatedFilePath,
-                    generatedFileLines[i], is(expectedFileLines[i]));
+            assertThat(generatedFileLines[i])
+                    .as("Wrong file content for file " + generatedFilePath)
+                    .isEqualTo(expectedFileLines[i]);
         }
     }
 }
