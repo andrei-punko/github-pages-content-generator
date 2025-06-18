@@ -207,8 +207,9 @@ public class GithubPagesContentGenerator {
     @SneakyThrows
     private String capitalize(String str) {
         if (str.startsWith("http://") || str.startsWith("https://")) {
-            var decoded = URLDecoder.decode(str, UTF_8);
-            return String.format("<a href=\"%s\">%s</a>", decoded, decoded);
+            var decodedStr = URLDecoder.decode(str, UTF_8);
+            var decodedNEscapedStr = decodedStr.replace("+", "%2B");
+            return String.format("<a href=\"%s\">%s</a>", decodedNEscapedStr, decodedStr);
         }
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
