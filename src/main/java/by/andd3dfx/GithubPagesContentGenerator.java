@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -26,6 +27,9 @@ public class GithubPagesContentGenerator {
     private static final String PLACEHOLDER_STRING = "***CONTENT_PLACEHOLDER***";
     private Map<String, Integer> headerToAmountMap = new HashMap<>();
     private String currentTags = "EMPTY";
+
+    /** Inline **bold** (Markdown-style); must not match H1 prefix {@code "** "} handled earlier. */
+    private static final Pattern INLINE_BOLD = Pattern.compile("\\*\\*([^*]+)\\*\\*");
 
     public String generate(String inputFileName, String templateFileName) throws IOException {
         String title = "";
@@ -109,10 +113,11 @@ public class GithubPagesContentGenerator {
         // Remove starting/ending spaces
         // line = line.trim();
 
-        // Usual line: just write it capitalized
+        // Usual line: escape, optional **bold**, then capitalize
         line = line
                 .replaceAll("<", "&lt;")
                 .replaceAll(">", "&gt;");
+        line = applyInlineBold(line);
         pBuffer.append(capitalize(line)).append("<br/>\n");
     }
 
@@ -120,7 +125,7 @@ public class GithubPagesContentGenerator {
         dumpBufferIntoOutputFile(pBuffer, outputBuffer);
 
         // Title line
-        pBuffer.append(wrapWithB(escapeAngleBrackets(line.substring(2))));
+        pBuffer.append(wrapWithB(applyInlineBold(escapeAngleBrackets(line.substring(2)))));
     }
 
     private void dumpBufferIntoOutputFile(StringBuilder pBuffer, StringBuilder outputBuffer) {
@@ -177,6 +182,22 @@ public class GithubPagesContentGenerator {
                 .replaceAll(">", "&gt;");
     }
 
+    /**
+     * Turns {@code **text**} into {@code <strong>text</strong>}. Nested asterisks inside the span are not supported.
+     */
+    String applyInlineBold(String str) {
+        var m = INLINE_BOLD.matcher(str);
+        StringBuilder sb = new StringBuilder();
+        int last = 0;
+        while (m.find()) {
+            sb.append(str, last, m.start());
+            sb.append("<strong>").append(m.group(1)).append("</strong>");
+            last = m.end();
+        }
+        sb.append(str.substring(last));
+        return sb.toString();
+    }
+
     private String wrapWithCode(String str) {
         return String.format("<code>%s</code>\n", escapeAngleBrackets(str));
     }
@@ -210,6 +231,13 @@ public class GithubPagesContentGenerator {
             var decodedStr = URLDecoder.decode(str, UTF_8);
             var decodedNEscapedStr = decodedStr.replace("+", "%2B");
             return String.format("<a href=\"%s\">%s</a>", decodedNEscapedStr, decodedStr);
+        }
+        // After applyInlineBold the line may start with "<strong>…"; do not strip the first character
+        if (str.startsWith("<")) {
+            return str;
+        }
+        if (str.isEmpty()) {
+            return str;
         }
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }

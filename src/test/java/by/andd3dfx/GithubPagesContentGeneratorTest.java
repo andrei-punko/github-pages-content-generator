@@ -21,6 +21,13 @@ public class GithubPagesContentGeneratorTest {
     }
 
     @Test
+    public void applyInlineBold_wrapsPairsOfAsterisks() {
+        assertThat(generator.applyInlineBold("a **b** c")).isEqualTo("a <strong>b</strong> c");
+        assertThat(generator.applyInlineBold("**x** only")).isEqualTo("<strong>x</strong> only");
+        assertThat(generator.applyInlineBold("no bold")).isEqualTo("no bold");
+    }
+
+    @Test
     public void generateIntoFile() throws IOException {
         final String INPUT_FILE_NAME = TEST_RESOURCES_PATH + "input.txt";
         final String TEMPLATE_FILE_NAME = TEST_RESOURCES_PATH + "template.html";
